@@ -8,7 +8,7 @@ import { useEffect } from "react";
 export default function Navbar() {
   useEffect(() => {
     const handleScrollSpy = () => {
-      const sections = ["about", "projects", "team"];
+      const sections = ["about", "events", "team"];
       const scrollPosition = window.scrollY + 200; // Offset for trigger
 
       // Check if we are at the top
@@ -74,7 +74,7 @@ export default function Navbar() {
 
             {/* Navigation Links */}
             <div className="hidden md:flex items-center gap-1">
-              {["About", "Projects", "Team"].map((item) => (
+              {["About", "Events", "Team"].map((item) => (
                 <Link
                   href={`#${item.toLowerCase()}`}
                   key={item}

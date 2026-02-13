@@ -6,9 +6,9 @@ export default function About() {
 
   return (
     <>
-      <section id="about" className="py-24 bg-white dark:bg-iot-dark">
+      <section id="about" className=" bg-white dark:bg-iot-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center">
-          <div className="text-center mb-6">
+          <div className="text-center mb-6 pt-10">
             <div className="w-fit mx-auto cursor-default">
               <h2 className="text-3xl md:text-5xl font-bold mb-2 text-black dark:text-white">
                 About Us
@@ -56,7 +56,7 @@ export default function About() {
         </div>
       </section>
 
-      <section id="mentor" className="py-24 bg-white dark:bg-iot-dark">
+      <section id="mentor" className="py-10 bg-white dark:bg-iot-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           {/* Mentor Card */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 md:p-6 rounded-2xl border border-gray-200 dark:border-iot-surface bg-gray-50 dark:bg-iot-surface/30 hover:border-iot-green hover:shadow-lg hover:shadow-iot-green/20 transition-all duration-300 items-start md:items-center">
