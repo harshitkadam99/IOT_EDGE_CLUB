@@ -15,7 +15,7 @@ export default function Events() {
         <h2 className="text-3xl md:text-5xl font-bold mb-6 text-iot-text dark:text-gray-100">
           Our Events
         </h2>
-        <div className="w-24 h-1 bg-gradient-to-r from-iot-green to-iot-green-dark mx-auto rounded-full mb-6"></div>
+        <div className="w-24 h-1 bg-linear-to-r from-iot-green to-iot-green-dark mx-auto rounded-full mb-6"></div>
         <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">
           Join us for workshops, hackathons, and tech talks. Connect with the
           community and level up your skills.
@@ -55,16 +55,47 @@ function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }
   );
 }
 
-function SlidingCarousel({ events, labelPrefix }: { events: Event[]; labelPrefix: string }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+function SlidingCarousel({ events, labelPrefix }: { events: Event[]; labelPrefix?: string }) {
+  const [currentIndex, setCurrentIndex] = useState(1);
+  const [isTransitioning, setIsTransitioning] = useState(true);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Clone first and last events for infinite loop
+  const extendedEvents = [
+    events[events.length - 1],
+    ...events,
+    events[0]
+  ];
+
+  const handleTransitionEnd = () => {
+    if (currentIndex === 0) {
+      setIsTransitioning(false);
+      setCurrentIndex(events.length);
+    } else if (currentIndex === events.length + 1) {
+      setIsTransitioning(false);
+      setCurrentIndex(1);
+    }
+  };
+
+  // Turn transition back on after jump
+  useEffect(() => {
+    if (!isTransitioning) {
+        // Force reflow
+        const timer = setTimeout(() => {
+           setIsTransitioning(true);
+        }, 50);
+        return () => clearTimeout(timer);
+    }
+  }, [isTransitioning]);
 
   const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % events.length);
-  }, [events.length]);
+    setCurrentIndex((prev) => prev + 1);
+  }, []);
 
   const handlePrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + events.length) % events.length);
-  }, [events.length]);
+    setCurrentIndex((prev) => prev - 1);
+  }, []);
 
   // Auto-slide effect
   useEffect(() => {
@@ -72,6 +103,30 @@ function SlidingCarousel({ events, labelPrefix }: { events: Event[]; labelPrefix
     const timer = setInterval(handleNext, 5000);
     return () => clearInterval(timer);
   }, [handleNext, events.length]);
+
+  // Touch handlers for mobile swipe
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      handleNext();
+    } else if (isRightSwipe) {
+      handlePrev();
+    }
+  };
+
 
   if (events.length === 0) {
     return (
@@ -82,16 +137,50 @@ function SlidingCarousel({ events, labelPrefix }: { events: Event[]; labelPrefix
   }
 
   return (
-    <div className="relative w-full h-[500px] md:h-[600px] group overflow-hidden shadow-2xl rounded-3xl bg-iot-surface">
+    <div className="relative w-full max-w-[80vw] md:max-w-[90vw] mx-auto group">
+      {/* Navigation Controls - Outside Frame */}
+      {events.length > 1 && (
+        <>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              handlePrev();
+            }}
+            // Mobile: relative positioning or tight absolute near edge, similar to PreviousEventsCarousel
+            className="absolute -left-6 md:-left-20 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full bg-white dark:bg-iot-surface text-iot-dark dark:text-white shadow-lg border border-gray-100 dark:border-white/10 hover:bg-iot-green hover:text-white dark:hover:bg-iot-green dark:hover:text-black transition-all z-30 transform scale-75 md:scale-100"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              handleNext();
+            }}
+            className="absolute -right-6 md:-right-20 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full bg-white dark:bg-iot-surface text-iot-dark dark:text-white shadow-lg border border-gray-100 dark:border-white/10 hover:bg-iot-green hover:text-white dark:hover:bg-iot-green dark:hover:text-black transition-all z-30 transform scale-75 md:scale-100"
+            aria-label="Next slide"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </>
+      )}
+
+      <div 
+        className="relative w-full h-[500px] md:h-[600px] overflow-hidden shadow-2xl rounded-3xl bg-iot-surface"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
       {/* Sliding Track */}
       <div 
-        className="flex h-full transition-transform duration-500 ease-in-out"
+        className={`flex h-full ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
+        onTransitionEnd={handleTransitionEnd}
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
-        {events.map((event, index) => {
+        {extendedEvents.map((event, index) => {
           return (
             <div 
-              key={event.id} 
+              key={`${event.id}-${index}`} 
               className={`min-w-full h-full relative ${event.image}`}
             >
               {/* Content Overlay */}
@@ -106,7 +195,7 @@ function SlidingCarousel({ events, labelPrefix }: { events: Event[]; labelPrefix
                           {event.category}
                         </span>
                         <span className="flex items-center gap-2 text-gray-100 text-sm font-medium bg-black/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/5">
-                          <Calendar size={14} className="text-iot-green-dark" /> {event.date}
+                          <Clock size={14} className="text-iot-green-dark" /> {event.date}
                         </span>
                       </div>
 
@@ -128,138 +217,108 @@ function SlidingCarousel({ events, labelPrefix }: { events: Event[]; labelPrefix
           );
         })}
       </div>
-
-      {/* Navigation Controls */}
-      {events.length > 1 && (
-        <>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              handlePrev();
-            }}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 p-4 rounded-full bg-black/20 text-white backdrop-blur-md border border-white/10 hover:bg-iot-green hover:border-iot-green transition-all z-30 opacity-100 md:opacity-0 md:group-hover:opacity-100 translate-x-0 md:translate-x-4 md:group-hover:translate-x-0 duration-300"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft size={28} />
-          </button>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              handleNext();
-            }}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 p-4 rounded-full bg-black/20 text-white backdrop-blur-md border border-white/10 hover:bg-iot-green hover:border-iot-green transition-all z-30 opacity-100 md:opacity-0 md:group-hover:opacity-100 translate-x-0 md:-translate-x-4 md:group-hover:translate-x-0 duration-300"
-            aria-label="Next slide"
-          >
-            <ChevronRight size={28} />
-          </button>
           
-          {/* Indicators */}
-          <div className="absolute bottom-8 right-8 md:right-16 flex gap-3 z-30">
-            {events.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentIndex(idx);
-                }}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  idx === currentIndex ? "w-12 bg-white" : "w-6 bg-white/40 hover:bg-white/60"
-                }`}
-                aria-label={`Go to slide ${idx + 1}`}
-              />
-            ))}
-          </div>
-        </>
-      )}
+      {/* Indicators */}
+      <div className="absolute bottom-6 right-6 md:bottom-8 md:right-16 flex gap-3 z-30">
+        {events.map((_, idx) => (
+            <button
+            key={idx}
+            onClick={(e) => {
+                e.preventDefault();
+                setCurrentIndex(idx + 1);
+            }}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+                (currentIndex - 1 + events.length) % events.length === idx ? "w-12 bg-white" : "w-6 bg-white/40 hover:bg-white/60"
+            }`}
+            aria-label={`Go to slide ${idx + 1}`}
+            />
+        ))}
+        </div>
+      </div>
     </div>
   );
 }
 
 function PreviousEventsCarousel({ events }: { events: Event[] }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(3); // Start at first real item (after 3 clones)
   const [isTransitioning, setIsTransitioning] = useState(true);
+  const [itemsPerView, setItemsPerView] = useState(3);
+  
+  // Responsive check
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerView(window.innerWidth < 768 ? 1 : 3);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  // Extend events for infinite loop illusion
-  // We append the first 3 events to the end so we can slide past the last real event seamlessly
-  const extendedEvents = [...events, ...events.slice(0, 3)];
-  const totalEvents = events.length;
+  // Prepare Extended List: 3 clones at start, 3 at end
+  // Only consistent if events.length > 0
+  const clonesCount = 3;
+  
+  // Ensure we have enough events to clone. If only 1 event, duplicate it to fill 3 spots?
+  // Ideally we need at least 3 events for a 3-item carousel to look good, 
+  // but if fewer, we just repeat them.
+  const safeEvents = events.length === 0 ? [] : events;
+  // If fewer than 3, multiply to get at least 3
+  const filledEvents = [...safeEvents];
+  while (filledEvents.length > 0 && filledEvents.length < 3) {
+      filledEvents.push(...safeEvents);
+  }
+  
+  const displayEvents = filledEvents.length > 0 ? [
+    ...filledEvents.slice(-clonesCount),
+    ...filledEvents,
+    ...filledEvents.slice(0, clonesCount)
+  ] : [];
 
-  const handleNext = useCallback(() => {
-    if (currentIndex >= totalEvents) {
-        // If we overlap boundary, reset first (should be handled by transitionEnd, but safe guard)
-        setIsTransitioning(false);
-        setCurrentIndex(0);
-        // Force reflow/next tick to re-enable transition
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                setIsTransitioning(true);
-                setCurrentIndex(1);
-            });
-        });
-    } else {
-        setCurrentIndex((prev) => prev + 1);
-    }
-  }, [currentIndex, totalEvents]);
+  const totalReal = filledEvents.length;
 
-  const handlePrev = useCallback(() => {
-    if (currentIndex === 0) {
-        // Jump to end
-        setIsTransitioning(false);
-        setCurrentIndex(totalEvents);
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                setIsTransitioning(true);
-                setCurrentIndex(totalEvents - 1);
-            });
-        });
-    } else {
-        setCurrentIndex((prev) => prev - 1);
-    }
-  }, [currentIndex, totalEvents]);
-
-  // Handle seamless loop reset when transition ends
   const handleTransitionEnd = () => {
-    if (currentIndex >= totalEvents) {
+    // Forward wrap
+    if (currentIndex >= totalReal + clonesCount) {
       setIsTransitioning(false);
-      setCurrentIndex(currentIndex % totalEvents);
-      // Re-enable transition for next move
-      requestAnimationFrame(() => {
-           setIsTransitioning(true);
-      });
+      // Snap to matching real item at start
+      // e.g. if we are at clonesCount + totalReal (first clone at end), snap to clonesCount (first real)
+      setCurrentIndex(currentIndex - totalReal);
+    } 
+    // Backward wrap
+    else if (currentIndex < clonesCount) {
+      setIsTransitioning(false);
+      // Snap to matching real item at end
+      setCurrentIndex(currentIndex + totalReal);
     }
   };
 
-  // Auto-slide effect
+  // Turn transition back on
   useEffect(() => {
-    if (totalEvents === 0) return;
+    if (!isTransitioning) {
+       const timer = setTimeout(() => {
+         setIsTransitioning(true);
+       }, 50);
+       return () => clearTimeout(timer);
+    }
+  }, [isTransitioning]);
+
+  const handleNext = useCallback(() => {
+    setCurrentIndex(prev => prev + 1);
+  }, []);
+
+  const handlePrev = useCallback(() => {
+      setCurrentIndex(prev => prev - 1);
+  }, []);
+
+  // Auto-slide
+  useEffect(() => {
+    if (displayEvents.length <= 1) return;
     const timer = setInterval(() => {
-        // Simple next logic for auto slide
-        setCurrentIndex(prev => {
-             if (prev >= totalEvents) {
-                 // If we are technically at the 'reset' point, we need to handle it.
-                 // But typically handleTransitionEnd handles the reset.
-                 // If we are at totalEvents, we should be at 0 visually.
-                 // Let's just increment. 
-                 return prev + 1;
-             }
-             return prev + 1;
-        });
+       handleNext();
     }, 5000);
     return () => clearInterval(timer);
-  }, [totalEvents]);
-
-  // Adjust index reset in effect if we drifted too far (safeguard)
-  useEffect(() => {
-      if (currentIndex === totalEvents + 1) {
-          // We went past the buffer? 
-          // Actually, if we hit totalEvents, visual is same as 0. 
-          // We wait for transitionEnd to snap back. 
-          // But if auto-slide triggered again fast?
-          // Let standard transitionEnd logic handle it.
-      }
-  }, [currentIndex, totalEvents]);
-
-
+  }, [handleNext, displayEvents.length]);
+  
   if (events.length === 0) {
     return (
       <div className="text-center py-10">
@@ -268,103 +327,76 @@ function PreviousEventsCarousel({ events }: { events: Event[] }) {
     );
   }
 
-  // Always show navigation if we have events, allowing cycling even if few
-  const showNavigation = events.length > 0;
-
+  // Calculate generic translation
+  // Each item width = 100% / itemsPerView
+  // To shift 1 index = shift 1 item width
+  // But we are translating the container (flex row).
+  // transform = -currentIndex * (100 / itemsPerView)%
+  
   return (
-    <div className="flex flex-col gap-6 w-full overflow-hidden">
-      <div className="flex items-center justify-between mb-4 px-1">
-        <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-6 w-full">
+      <div className="flex items-center gap-3 mb-4 px-1">
           <div className="p-2 bg-iot-green/10 dark:bg-iot-green/20 rounded-lg text-iot-green dark:text-iot-green">
             <Clock size={24} />
           </div>
           <h3 className="text-2xl font-bold text-iot-text dark:text-white">Previous Events</h3>
-        </div>
-
-        {showNavigation && (
-          <div className="flex gap-2 z-10">
-            <button 
-              onClick={handlePrev} 
-              className="p-2 rounded-full bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/20 text-gray-700 dark:text-white transition-all shadow-sm"
-              aria-label="Previous events"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <button 
-              onClick={handleNext} 
-              className="p-2 rounded-full bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/20 text-gray-700 dark:text-white transition-all shadow-sm"
-               aria-label="Next events"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
-        )}
       </div>
 
-      <div className="w-full overflow-hidden">
-         <div 
-           className="flex gap-6"
-           style={{
-             transform: `translateX(calc(-${currentIndex * (100 / 3 + 0)}% - ${currentIndex * 1.5}rem))`, 
-             // Note: 1.5rem is approx gap-6 (24px). 
-             // Exact calc for gap in flex translation is tricky.
-             // Easier approach: Use width 33.33% and NO gap, but padding inside item.
-           }}
-         >
-             {/* 
-                Correction: gap-6 in flex container with translate % is hard to align perfectly without calc.
-                Better: Use a grid-like flex basis.
-                3 visible items. 100% width.
-                Item width = (100% - 2 * gap) / 3 ?
-                Let's stick to: Flex container width 100%. Item width 1/3 (33.333%).
-                Padding for gap.
-             */}
-         </div>
-         {/* Re-implementing container properly for sliding */}
-         <div 
-            className={`flex transition-transform ease-in-out ${isTransitioning ? 'duration-500' : 'duration-0'}`}
-            onTransitionEnd={handleTransitionEnd}
-            style={{ 
-                // We show 3 items. So shift by 1/3 per index.
-                transform: `translateX(-${currentIndex * (100 / 3)}%)` 
-            }}
-         >
-            {extendedEvents.map((event, idx) => {
-                return (
+      <div className="relative w-full group/prev">
+        <div className="overflow-hidden rounded-2xl mx-0 md:mx-4">
+             <div 
+                className={`flex ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
+                onTransitionEnd={handleTransitionEnd}
+                style={{ 
+                    transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` 
+                }}
+             >
+                {displayEvents.map((event, idx) => (
                     <div 
-                        key={`${event.id}-dup-${idx}`} 
-                        className="min-w-[33.333333%] px-3" // Using padding instead of gap for easier calc
+                        key={`${event.id}-${idx}`} 
+                        className={`none shrink-0 px-2 md:px-3`}
+                        style={{ width: `${100 / itemsPerView}%` }}
                     >
                          <Link href={`/events/${event.id}`} className="block h-full"> 
                             <div 
-                                className="relative h-80 w-full rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 ring-1 ring-black/5 dark:ring-white/10"
+                                className="relative h-80 w-full rounded-2xl overflow-hidden group/card cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 ring-1 ring-black/5 dark:ring-white/10"
                             >
-                                {/* Event Gradient Background */}
-                                <div className={`absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-110 ${event.image}`} />
+                                <div className={`absolute inset-0 w-full h-full bg-cover bg-center transition-transform duration-700 group-hover/card:scale-110 ${event.image}`} />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-60 group-hover/card:opacity-90 transition-opacity" />
                                 
-                                {/* Overlay Textures */}
-                                <div className="absolute inset-0 opacity-20 bg-[url('/assets/grid-pattern.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-
-                                {/* Overlay Gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
-
-                                {/* Text Content Overlay */}
-                                <div className="absolute bottom-0 left-0 w-full p-6 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform">
-                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-wider uppercase bg-purple-600 rounded-full">
-                                    Previous
-                                </span>
-                                <h4 className="text-2xl font-bold mb-2 leading-tight">{event.title}</h4>
-                                <div className="flex items-center gap-4 text-sm font-medium text-gray-300">
-                                    <span className="flex items-center gap-1"><Calendar size={14} /> {event.date}</span>
-                                    <span className="flex items-center gap-1"><MapPin size={14} /> {event.location}</span>
-                                </div>
+                                <div className="absolute bottom-0 left-0 w-full p-6 text-white transform translate-y-2 group-hover/card:translate-y-0 transition-transform">
+                                    <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-wider uppercase bg-purple-600 rounded-full">
+                                        Previous
+                                    </span>
+                                    <h4 className="text-sm md:text-2xl font-bold mb-2 leading-tight">{event.title}</h4>
+                                    <div className="flex items-center gap-4 text-xs md:text-sm font-medium text-gray-300">
+                                        <span className="flex items-center gap-1"><Clock size={14} /> {event.date}</span>
+                                    </div>
                                 </div>
                             </div>
                         </Link>
                     </div>
-                );
-            })}
-         </div>
+                ))}
+            </div>
+        </div>
+
+        {/* Navigation Buttons - Outside on Desktop, overlaid on Mobile but better placed */}
+        <>
+            <button 
+              onClick={(e) => { e.preventDefault(); handlePrev(); }}
+              className="absolute -left-2 md:-left-8 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full bg-white dark:bg-iot-surface border border-gray-200 dark:border-white/10 hover:bg-iot-green hover:text-white dark:hover:bg-iot-green dark:hover:text-black transition-all shadow-lg z-20"
+              aria-label="Previous events"
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <button 
+              onClick={(e) => { e.preventDefault(); handleNext(); }}
+              className="absolute -right-2 md:-right-8 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full bg-white dark:bg-iot-surface border border-gray-200 dark:border-white/10 hover:bg-iot-green hover:text-white dark:hover:bg-iot-green dark:hover:text-black transition-all shadow-lg z-20"
+               aria-label="Next events"
+            >
+              <ChevronRight size={24} />
+            </button>
+        </>
       </div>
     </div>
   );
