@@ -6,9 +6,9 @@ export default function About() {
 
   return (
     <>
-      <section id="about" className="py-24 bg-white dark:bg-iot-dark">
+      <section id="about" className=" bg-white dark:bg-iot-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center">
-          <div className="text-center mb-6">
+          <div className="text-center mb-6 pt-10">
             <div className="w-fit mx-auto cursor-default">
               <h2 className="text-3xl md:text-5xl font-bold mb-2 text-black dark:text-white">
                 About Us
@@ -19,7 +19,7 @@ export default function About() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Our Vision */}
-            <div className="md:col-span-2 p-4 md:p-6 rounded-2xl border border-gray-200 dark:border-iot-surface bg-gray-50 dark:bg-iot-surface/30 hover:border-iot-green hover:shadow-lg hover:shadow-iot-green/20 transition-all flex flex-col justify-center items-center text-center">
+            <div className="md:col-span-2 p-4 md:p-6 rounded-2xl all flex flex-col justify-center items-center text-center">
               <div className="px-5 py-1.5 rounded-lg mb-3 bg-iot-green-dark/20 border border-iot-green-dark">
                 <h3 className="text-lg font-bold text-black dark:text-white">
                   Our Vision
@@ -29,7 +29,7 @@ export default function About() {
                 Students are encouraged to explore IoT and edge technologies as exciting career paths, while developing creativity and innovation in smart systems and automation.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                 <div className="p-4 rounded-xl border-2 border-iot-green-dark bg-white dark:bg-black/20 flex flex-col justify-center items-center text-center hover:border-iot-green hover:shadow-lg hover:shadow-iot-green/20 transition-all h-full">
                   <h3 className="text-base font-bold mb-1 text-black dark:text-white">
                     Smart Device Prototyping
@@ -47,7 +47,7 @@ export default function About() {
                     Empowering industries with smart automation solutions that enhance efficiency, reliability, and operational control.
                   </p>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             
@@ -56,7 +56,7 @@ export default function About() {
         </div>
       </section>
 
-      <section id="mentor" className="py-24 bg-white dark:bg-iot-dark">
+      <section id="mentor" className="py-10 bg-white dark:bg-iot-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           {/* Mentor Card */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 md:p-6 rounded-2xl border border-gray-200 dark:border-iot-surface bg-gray-50 dark:bg-iot-surface/30 hover:border-iot-green hover:shadow-lg hover:shadow-iot-green/20 transition-all duration-300 items-start md:items-center">

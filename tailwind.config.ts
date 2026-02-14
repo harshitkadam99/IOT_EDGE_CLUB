@@ -19,6 +19,9 @@ const config: Config = {
           text: "#0F172A",    // Primary Text
         },
       },
+      fontFamily: {
+        pixel: ["var(--font-pixel)", "monospace"],
+      },
     },
   },
   plugins: [],
