@@ -9,8 +9,8 @@ export default function Join() {
         </h2>
         
         <p className="text-gray-600 dark:text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 text-balance">
-          Whether you're a hardware enthusiast, a firmware wizard, or just curious about 
-          the world of IoT, there's a node for you in our network.
+          Whether you&apos;re a hardware enthusiast, a firmware wizard, or just curious about 
+          the world of IoT, there&apos;s a node for you in our network.
         </p>
 
         <div className="flex flex-col items-center justify-center gap-6">

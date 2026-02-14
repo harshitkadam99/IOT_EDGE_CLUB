@@ -15,8 +15,8 @@ html {
   --color-iot-light: #F8FAFC;
   --color-iot-text: #0F172A;
   
-  --font-sans: var(--font-pixel), Arial, Helvetica, sans-serif;
-  --font-pixel: var(--font-pixel), Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-pixel), 'Courier New', Courier, monospace;
+  --font-pixel: var(--font-pixel), 'Courier New', Courier, monospace;
   
   --animate-scroll: scroll 30s linear infinite;
 
@@ -28,10 +28,17 @@ html {
       transform: translateX(-50%);
     }
   }
+
+  --animate-blink: blink 1s step-end infinite;
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
 }
 
 :root {
-  --background: var(--color-iot-light);
+  --background: var(--color-iot-dark);
   --foreground: var(--color-iot-text);
   --card: #FFFFFF;
   --accent: var(--color-iot-green);
@@ -47,7 +54,7 @@ html {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-pixel), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
   transition: background 0.3s ease, color 0.3s ease;
 }
 

@@ -225,7 +225,7 @@ export default function Team() {
           {/* Left Button */}
           <button
             onClick={() => handleManualScroll("left")}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-iot-surface border border-gray-200 dark:border-white/10 text-gray-800 dark:text-white hover:bg-iot-green hover:text-black dark:hover:bg-iot-green dark:hover:text-black transition-all shadow-lg opacity-0 group-hover/container:opacity-100 focus:opacity-100 duration-300"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-iot-surface border border-gray-200 dark:border-white/10 text-gray-800 dark:text-white hover:bg-iot-green hover:text-black dark:hover:bg-iot-green dark:hover:text-black transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover/container:opacity-100 focus:opacity-100 duration-300"
             aria-label="Scroll Left"
           >
             <ChevronLeft size={24} />
@@ -312,7 +312,7 @@ export default function Team() {
           {/* Right Button */}
           <button
             onClick={() => handleManualScroll("right")}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-iot-surface border border-gray-200 dark:border-white/10 text-gray-800 dark:text-white hover:bg-iot-green hover:text-black dark:hover:bg-iot-green dark:hover:text-black transition-all shadow-lg opacity-0 group-hover/container:opacity-100 focus:opacity-100 duration-300"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-iot-surface border border-gray-200 dark:border-white/10 text-gray-800 dark:text-white hover:bg-iot-green hover:text-black dark:hover:bg-iot-green dark:hover:text-black transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover/container:opacity-100 focus:opacity-100 duration-300"
             aria-label="Scroll Right"
           >
             <ChevronRight size={24} />

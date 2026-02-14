@@ -5,15 +5,6 @@ import { useEffect, useState, useCallback } from "react";
 import { eventsData, Event } from "@/lib/eventsData";
 import Link from "next/link";
 
-// Define a palette of gradients that align with the site theme
-const GRADIENTS = [
-  "bg-gradient-to-br from-iot-green via-iot-green-dark to-indigo-900",
-  "bg-gradient-to-br from-slate-900 via-iot-green-dark to-iot-green",
-  "bg-gradient-to-br from-indigo-800 via-blue-700 to-sky-500",
-  "bg-gradient-to-br from-sky-600 via-cyan-600 to-teal-500",
-  "bg-gradient-to-br from-blue-900 via-slate-800 to-gray-900",
-];
-
 export default function Events() {
   const upcomingEvents = eventsData.filter((e) => e.category === "Upcoming");
   const previousEvents = eventsData.filter((e) => e.category === "Previous");
@@ -98,14 +89,10 @@ function SlidingCarousel({ events, labelPrefix }: { events: Event[]; labelPrefix
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {events.map((event, index) => {
-          // Cycle through gradients based on index
-          const gradientClass = GRADIENTS[index % GRADIENTS.length];
-          const genericTitle = `${labelPrefix} ${index + 1}`;
-          
           return (
             <div 
               key={event.id} 
-              className={`min-w-full h-full relative ${gradientClass}`}
+              className={`min-w-full h-full relative ${event.image}`}
             >
               {/* Content Overlay */}
               <Link 
@@ -123,12 +110,12 @@ function SlidingCarousel({ events, labelPrefix }: { events: Event[]; labelPrefix
                         </span>
                       </div>
 
-                      <h3 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-lg tracking-tight">
-                        {genericTitle}
+                      <h3 className="text-3xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-lg tracking-tight">
+                        {event.title}
                       </h3>
                       
                       <p className="text-gray-200 text-lg md:text-xl line-clamp-2 max-w-2xl mb-8 opacity-90 font-light leading-relaxed">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+                        {event.description}
                       </p>
 
                       <div className="inline-flex items-center gap-3 text-white font-bold text-lg hover:gap-4 transition-all bg-white/10 hover:bg-white/20 border border-white/20 px-8 py-3 rounded-full backdrop-blur-md">
@@ -150,7 +137,7 @@ function SlidingCarousel({ events, labelPrefix }: { events: Event[]; labelPrefix
               e.preventDefault();
               handlePrev();
             }}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 p-4 rounded-full bg-black/20 text-white backdrop-blur-md border border-white/10 hover:bg-iot-green hover:border-iot-green transition-all z-30 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300"
+            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 p-4 rounded-full bg-black/20 text-white backdrop-blur-md border border-white/10 hover:bg-iot-green hover:border-iot-green transition-all z-30 opacity-100 md:opacity-0 md:group-hover:opacity-100 translate-x-0 md:translate-x-4 md:group-hover:translate-x-0 duration-300"
             aria-label="Previous slide"
           >
             <ChevronLeft size={28} />
@@ -160,7 +147,7 @@ function SlidingCarousel({ events, labelPrefix }: { events: Event[]; labelPrefix
               e.preventDefault();
               handleNext();
             }}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 p-4 rounded-full bg-black/20 text-white backdrop-blur-md border border-white/10 hover:bg-iot-green hover:border-iot-green transition-all z-30 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 duration-300"
+            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 p-4 rounded-full bg-black/20 text-white backdrop-blur-md border border-white/10 hover:bg-iot-green hover:border-iot-green transition-all z-30 opacity-100 md:opacity-0 md:group-hover:opacity-100 translate-x-0 md:-translate-x-4 md:group-hover:translate-x-0 duration-300"
             aria-label="Next slide"
           >
             <ChevronRight size={28} />
@@ -343,11 +330,6 @@ function PreviousEventsCarousel({ events }: { events: Event[] }) {
             }}
          >
             {extendedEvents.map((event, idx) => {
-                // Stable index for gradient selection
-                const originalIndex = events.findIndex(e => e.id === event.id);
-                const gradientClass = GRADIENTS[originalIndex % GRADIENTS.length];
-                const genericTitle = `Event ${originalIndex + 1}`; 
-
                 return (
                     <div 
                         key={`${event.id}-dup-${idx}`} 
@@ -358,7 +340,7 @@ function PreviousEventsCarousel({ events }: { events: Event[] }) {
                                 className="relative h-80 w-full rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 ring-1 ring-black/5 dark:ring-white/10"
                             >
                                 {/* Event Gradient Background */}
-                                <div className={`absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-110 ${gradientClass}`} />
+                                <div className={`absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-110 ${event.image}`} />
                                 
                                 {/* Overlay Textures */}
                                 <div className="absolute inset-0 opacity-20 bg-[url('/assets/grid-pattern.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
@@ -371,7 +353,7 @@ function PreviousEventsCarousel({ events }: { events: Event[] }) {
                                 <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-wider uppercase bg-purple-600 rounded-full">
                                     Previous
                                 </span>
-                                <h4 className="text-2xl font-bold mb-2 leading-tight">{genericTitle}</h4>
+                                <h4 className="text-2xl font-bold mb-2 leading-tight">{event.title}</h4>
                                 <div className="flex items-center gap-4 text-sm font-medium text-gray-300">
                                     <span className="flex items-center gap-1"><Calendar size={14} /> {event.date}</span>
                                     <span className="flex items-center gap-1"><MapPin size={14} /> {event.location}</span>

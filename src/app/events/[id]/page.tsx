@@ -30,11 +30,15 @@ export default async function EventDetails({ params }: PageProps) {
         </Link>
         
         <div className="relative w-full h-64 md:h-96 rounded-3xl overflow-hidden mb-8 shadow-2xl">
-           <img
-            src={event.image}
-            alt={event.title}
-            className="object-cover w-full h-full"
-          />
+           {event.image.startsWith('http') ? (
+             <img
+              src={event.image}
+              alt={event.title}
+              className="object-cover w-full h-full"
+             />
+           ) : (
+             <div className={`w-full h-full ${event.image}`} />
+           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white">
             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 inline-block ${
