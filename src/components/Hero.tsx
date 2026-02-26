@@ -57,7 +57,7 @@ export default function Hero() {
         className="absolute bottom-[12%] left-[5%] md:bottom-[10%] md:left-[5%] w-24 sm:w-40 md:w-52 lg:w-64 rotate-12 opacity-60 hover:opacity-100 hover:scale-110 hover:rotate-6 transition-all duration-500 ease-in-out pointer-events-auto select-none mix-blend-screen"
       />
       <img 
-        src="/assets/esp32.png" 
+        src="/assets/Esp32.png" 
         alt="ESP32" 
         className="absolute bottom-[12%] right-[5%] md:bottom-[10%] md:right-[5%] w-24 sm:w-40 md:w-52 lg:w-64 -rotate-12 opacity-60 hover:opacity-100 hover:scale-110 hover:rotate-6 transition-all duration-500 ease-in-out pointer-events-auto select-none mix-blend-screen"
       />
