@@ -3,13 +3,20 @@
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   useEffect(() => {
     const handleScrollSpy = () => {
-      const sections = ["about", "projects", "team"];
+      const sections = ["about", "events", "team"];
       const scrollPosition = window.scrollY + 200; // Offset for trigger
+
+      // Update scroll state for navbar transition
+      setIsScrolled(window.scrollY > 20);
 
       // Check if we are at the top
       if (window.scrollY < 100) {
@@ -41,6 +48,7 @@ export default function Navbar() {
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) => {
     e.preventDefault();
+    setIsMobileMenuOpen(false);
     const targetId = href.replace('#', '');
     const elem = document.getElementById(targetId);
     window.history.pushState({}, '', href);
@@ -57,9 +65,17 @@ export default function Navbar() {
   };
 
   return (
-    <div className="absolute top-6 z-50 flex justify-center px-4 w-full">
+    <div 
+      className={`z-50 flex justify-center w-full transition-all duration-300 ease-in-out ${
+        isScrolled ? "fixed top-0 px-0" : "absolute top-6 px-4"
+      }`}
+    >
       {/* Floating Navbar Container */}
-      <nav className="w-full max-w-7xl border border-white/50 dark:border-white/10 rounded-2xl bg-white/60 dark:bg-black/60 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] ring-1 ring-white/60 dark:ring-white/5">
+      <nav 
+        className={`w-full border border-white/50 dark:border-white/10 bg-white/60 dark:bg-black/60 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] ring-1 ring-white/60 dark:ring-white/5 transition-all duration-300 ease-in-out ${
+          isScrolled ? "max-w-full rounded-none border-x-0 border-t-0" : "max-w-7xl rounded-2xl"
+        }`}
+      >
         <div className="px-6 py-2">
           <div className="flex justify-between items-center h-12">
             {/* Logo Section */}
@@ -74,7 +90,7 @@ export default function Navbar() {
 
             {/* Navigation Links */}
             <div className="hidden md:flex items-center gap-1">
-              {["About", "Projects", "Team"].map((item) => (
+              {["About", "Events", "Team"].map((item) => (
                 <Link
                   href={`#${item.toLowerCase()}`}
                   key={item}
@@ -84,13 +100,36 @@ export default function Navbar() {
                   {item}
                 </Link>
               ))}
-
-              
             </div>
-            <div className="ml-2 pl-2">
-                <ThemeToggle />
-              </div>
+
+            <div className="flex items-center gap-2">
+                <div className="ml-2 pl-2">
+                    <ThemeToggle />
+                </div>
+                <button 
+                  className="md:hidden p-2 text-gray-800 dark:text-gray-200"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                  {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+            </div>
           </div>
+
+           {/* Mobile Menu */}
+           <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? "max-h-60 opacity-100 mt-2 border-t border-white/10" : "max-h-0 opacity-0"}`}>
+               <div className="flex flex-col gap-1 pt-2">
+                  {["About", "Events", "Team"].map((item) => (
+                    <Link
+                      href={`#${item.toLowerCase()}`}
+                      key={item}
+                      onClick={(e) => handleScroll(e, `#${item.toLowerCase()}`)}
+                      className="block px-4 py-3 text-center rounded-lg hover:bg-white/50 dark:hover:bg-white/10 text-gray-800 dark:text-gray-200 font-bold transition-colors"
+                    >
+                      {item}
+                    </Link>
+                  ))}
+               </div>
+           </div>
         </div>
       </nav>
     </div>

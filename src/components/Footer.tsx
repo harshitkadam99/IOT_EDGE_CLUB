@@ -15,7 +15,7 @@ export default function Footer() {
                 href="/"
                 className="hover:scale-105 transition-transform duration-300"
               >
-                <Logo className="text-4xl" edgeColor="text-iot-green-deep dark:text-iot-green" />
+                <Logo className="text-4xl" edgeColor="text-iot-green dark:text-iot-green" />
               </Link>
             </div>
           </div>
